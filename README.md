@@ -3,13 +3,13 @@
 ## 安装依赖
 
 ### webpack
->webpack
->webpack-cli
+* webpack
+* webpack-cli
 
 ### vue
->vue
->vue-loader
->vue-template-compiler
+* vue
+* vue-loader
+* vue-template-compiler
 
 ### babel
 >save
@@ -21,13 +21,13 @@
 * @babel/core
 
 ### html && css
->html-webpack-plugin
->style-loader
->css-loader
->node-sass sass-loader
->postcss-loader autoprefixer
+* html-webpack-plugin
+* style-loader
+* css-loader
+* node-sass sass-loader
+* postcss-loader autoprefixer
 
 ### clean file
->clean-webpack-plugin
+* clean-webpack-plugin
 
 
