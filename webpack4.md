@@ -1,4 +1,4 @@
-# webpack从零开始搭建一个vue项目
+# webpack4从零开始搭建一个vue项目
 
 ## 依赖项
 >首先我们安装所需依赖，值得注意的是，安装webpack的正确方式是采用局部安装，因为每个项目所依赖的webpack版本会有所不同，局部安装可以更好的管理。
@@ -97,7 +97,7 @@
 ## webpack配置文件
 >因为要区分开发模式与生产模式，所以我们要准备两个配置文件，当然我们通常会把配置文件的公共部分放入一个文件中，我习惯命名为webpack.base.js。接下来就该轮到我们在依赖项中提到的工具方法webpack-merge 登场了，再新建两个文件，通常为webpack.dev.js(开发环境使用)、webpack.prod.js(生产环境中使用)。
 
->编辑公共配置文件
+编辑公共配置文件
 
 ```
 module.exports = {
@@ -131,7 +131,7 @@ module.exports = {
   }
 }
 ```
-> 完整配置文件如下
+完整配置文件如下
 
 ```
 /**
@@ -155,22 +155,47 @@ module.exports = {
   entry: './src/main.js',
   output: {
     /**
-   * __dirname表示当前文件所在的目录
+   * __dirname表示当前文件所在的目录，他是一个绝对路径
+   * path.resolve() -- 方法可以将多个路径解析为一个规范化的绝对路径
+   * path.join() -- 连接路径，将多个字符串路径合并成一个完整的路径
    */
     path: path.resolve(__dirname, '../dist'),
+  /**
+   * 定义打包之后的文件名，定义成你喜欢的名字
+   */
     filename: 'bundle.js'
   },
+  /**
+   * 定义模块如何被解析
+   */
   resolve: {
+  /**
+   * 为这些后缀名文件自动添加后缀名
+   * 使用前引入一个vue import App from './App.vue'
+   * 使用后 import App from './App'
+   * 这样的好处是看起来更加简洁
+   */
     extensions: ['.js', '.vue', '.json'],
+  /**
+   * 为特定目录设置别名
+   */
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
   },
+  /**
+   * 定义模块解析使用的loader
+   */
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
+    /**
+     * 这里我们使用babel-loader处理js文件
+     * 值得注意的是，babel-loader只是连接webpack与babel之间的一个桥梁，本身不会翻译es6语法
+     * 具体的babel配置我们在根目录下新建一个.babelrc配置babel
+     */
         use: 'babel-loader'
       },
       {
@@ -183,6 +208,10 @@ module.exports = {
           'style-loader',
           {
             loader: 'css-loader',
+      /**
+       * importLoader 的意思是在使用css-loader之前好要使用两个loader
+       * 主要用于使用import引入sass文件时不会使用sass-loader postcss-loader
+       */
             options: {
               importLoaders: 2
             }
@@ -208,6 +237,9 @@ module.exports = {
       }
     ]
   },
+  /**
+   * plugins 使用时都需要通过new的方式
+   */
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
@@ -217,5 +249,147 @@ module.exports = {
   ]
 }
 ```
+编辑生产环境中的配置文件：webpack.prod.js
+
+```
+const merge = require('webpack-merge);
+/**
+ * 引入基础配置
+ */
+const baseConfig = require('./webpack.base.js);
+/**
+ * 合并两个对象，并导出
+ */
+module.exports = merge(baseConfig, {
+  /**
+   * 设置模式打包时会压缩代码
+   */
+  mode: 'production'
+})
+```
+
+编辑开发环境中的配置文件：webpack.dev.js
+```
+  const merge = require('webpack-merge);
+  const baseConfig = require('./webpack.base.js);
+  module.exports = merge(baseConfig, {
+    mode: 'development',
+    devServer: {
+      /**
+       * 从哪个文件中获取项目文件
+       */
+      contentBase: '',
+      /**
+       * 设置服务器端口
+       */
+      port: '',
+      /**
+       * 模块热更新，webpack感知到文件的修改就会自动刷新页面
+       */
+      hot: '',
+      hotOnly: '',
+      /**
+       * 是否自动打开浏览器
+       */
+      open: ''
+    }
+  })
+```
+在此之后，我们还需要配置两个配置文件 babel和postcss
+* .babelrc
+>前面提到的babel-loader只是给webpack和babel之间搭建了一个桥梁，真正把es6语法翻译成es5语法的就是@babel/preset-env,它作为babel的一个插件
+
+```
+{
+  presets: ["@babel/preset-env"]
+}
+```
+* postcss.config.js
+
+```
+{
+  module.exports = {
+    plugins: [
+      require('autoprefixer')
+    ]
+  }
+}
+```
+
+
+这样的话，我们就配置好了wepback打包的相关配置。当然这还不够，我们得告诉它打包时使用哪个配置文件，以及何时使用开发模式打包，何时使用生产模式打包。
+所以我们要在package.json 中配置打包命令：
+
+```
+"scripts": {
+  /**
+   * 当运行 npm run start 命令时，使用wepback-dev-server帮我们开启一个服务器，方便开发
+   */
+  "start": "webpack-dev-server --config ./build/webpack.dev.js",
+  "build": "webpack --config ./build/webpack.prod.js"
+}
+```
+*以上为基础配置项，如果只是简单搭建一个项目已经可以运行，后期有什么用到的loader或者plugin自行按照webpack官网文档即可*
+
+## vue项目的目录
+>此处可参照vue脚手架搭建的项目结构
+目录如下：
++ src
+  + assets -- 存放一些静态资源，比如图片，样式也可以放在里面
+  + components -- 存放组件
+  + styles -- 这里放入一些全局样式，包括初始化样式和字体文件
+  + views -- 页面文件夹（也可以把页面和组件放入同一个文件夹）
+  - App.vue -- 页面入口文件
+  - index.html -- 入口页面
+  - main.js -- 程序入口文件，加载各种公共组件
+
+主要入口文件的编辑：
+* App.vue
+~~~
+<template>
+  <div id="app">
+    <router-view />
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'app'
+}
+</script>
+~~~
+
+* index.html
+~~~
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="view-port" content="width=device-width, initial-scale=1.0">
+  <title>webpack vue</title>
+</head>
+<body>
+  <div id="app">
+    <h1>hello world</h1>
+  </div>
+</body>
+</html>
+~~~
+
+* main.js
+~~~
+  import Vue from 'vue';
+  import router from './router';
+  import App from './App';
+
+  import './styles/index.scss';
+
+  new Vue({
+    el: '#app',
+    router,
+    render: h => h(App)
+  }).$mount('#app');
+~~~
+
 
 
