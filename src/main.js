@@ -3,6 +3,7 @@ import router from './router';
 import App from './App';
 
 import './styles/index.scss';
+import './styles/iconfont.scss';
 
 new Vue({
   el: '#app',

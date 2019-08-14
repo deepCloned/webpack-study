@@ -47,14 +47,24 @@ module.exports = {
           {
             loader: 'url-loader',
             options: {
-              limit: 8192
+              limit: 8192786575,
+              name: '[name].[ext]',
+              outputPath: 'images'
             }
           }
         ]
       },
       {
         test: /\.(ttf|svg|woff|woff2|eot)$/,
-        use: 'file-loader'
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name]_[ext]',
+              outputPath: 'fonts/'
+            }
+          }
+        ]
       }
     ]
   },
