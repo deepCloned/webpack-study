@@ -297,7 +297,7 @@ Babel包含一个polyfill，它包含一个自定义的再生器运行时和core
 这将模拟完整的ES2015 +环境，引入该模块，可以自动添加在项目中使用了但运行环境中还没有实现的功能，比如（Primise），默认引入所有功能，可通过设置按需引入。
 *该模块需要安装在生产环境中。*
 
-** 配置 **
+**配置**
 
 ```
 // webpack.config.js
@@ -336,12 +336,13 @@ module: {
 }
 
 // main.js -- 入口文件顶部引入
+// 如果在 Babel 配置文件中配置了 useBuiltIns,则不需要在额外引入 @babel/polyfill
 import '@babel/polyfill';
 ```
 
 以上的配置是在打包业务逻辑代码时使用，如果是打包一个库类的文件，这些配置就有些不合适了，因为在引入 @babel/polyfill 时会污染全局。
 
-** 打包库类文件的配置 **
+**打包库类文件的配置**
 + 模块：
 - @babel/plugin-transform-runtime
 - @babel/runtime

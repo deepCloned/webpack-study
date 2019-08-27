@@ -1,9 +1,7 @@
 const merge = require('webpack-merge');
 const path = require('path');
 
-const baseConfig = require('./webpack.base.js');
-
-module.exports = merge(baseConfig, {
+module.exports = {
   mode: 'development',
   devtool: 'cheap-module-eval-source-map',
   devServer: {
@@ -17,4 +15,4 @@ module.exports = merge(baseConfig, {
     chunkFilename: '[name].js',
     filename: '[name].js'
   }
-})
+}

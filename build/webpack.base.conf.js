@@ -4,8 +4,12 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const path = require('path');
+const merge = require('webpack-merge');
 
-module.exports = {
+const devConfig = require('./webpack.dev.conf.js');
+const prodConfig = require('./webpack.prod.conf.js');
+
+const baseConfig = {
   entry: {
     main: './src/main.js'
   },
@@ -20,21 +24,12 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: [
-          'babel-loader',
-          {
-            loader: 'eslint-loader',
-            options: {
-              // 对于一些微小的错误，eslint 会自动帮你修复
-              fix: true,
-            },
-          },
-        ],
+        use: 'babel-loader'
       },
       {
         test: /\.vue$/,
         exclude: /node_modules/,
-        use: 'vue-loader',
+        use: 'vue-loader'
       },
       {
         test: /\.(sa|sc|c)ss$/,
@@ -43,19 +38,19 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: '../',
-            },
+              publicPath: '../'
+            }
           },
           // 'style-loader',
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 2,
-            },
+              importLoaders: 2
+            }
           },
           'sass-loader',
-          'postcss-loader',
-        ],
+          'postcss-loader'
+        ]
       },
       {
         test: /\.(png|jpg|gif)$/,
@@ -66,10 +61,10 @@ module.exports = {
             options: {
               limit: 8192,
               name: '[name].[ext]',
-              outputPath: 'images/',
-            },
-          },
-        ],
+              outputPath: 'images/'
+            }
+          }
+        ]
       },
       {
         test: /\.(ttf|svg|woff|woff2|eot)$/,
@@ -79,16 +74,16 @@ module.exports = {
             loader: 'file-loader',
             options: {
               name: '[name]_[ext]',
-              outputPath: 'fonts/',
-            },
-          },
-        ],
-      },
-    ],
+              outputPath: 'fonts/'
+            }
+          }
+        ]
+      }
+    ]
   },
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      chunks: "all",
       minSize: 30000,
       minChunks: 1,
       maxAsyncRequests: 5,
@@ -98,7 +93,7 @@ module.exports = {
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
-          priority: -10,
+          priority: -10
         },
         styles: {
           name: 'styles',
@@ -108,20 +103,30 @@ module.exports = {
         default: {
           // minChunks: 1,
           priority: -20,
-          reuseExistingChunk: true,
-        },
-      },
-    },
+          reuseExistingChunk: true
+        }
+      }
+    }
   },
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: 'src/index.html',
+      template: 'src/index.html'
     }),
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
-      chunkFilename: '[name].chunk.css',
-    }),
-  ],
+      chunkFilename: '[name].chunk.css'
+    })
+  ]
+}
+
+module.exports = (env) => {
+  console.log('env.production is', env.production);
+  if (env.production) {
+    return merge(baseConfig, prodConfig);
+  }
+  else {
+    return merge(baseConfig, devConfig);
+  }
 }
