@@ -7,19 +7,19 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    main: './src/main.js'
+    main: './src/main.js',
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      '@': path.resolve(__dirname, 'src')
-    }
+      '@': path.resolve(__dirname, 'src'),
+    },
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        include: path.resolve(__dirname, '../src'),
         use: [
           'babel-loader',
           {

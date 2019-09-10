@@ -1,4 +1,4 @@
-## Library 的打包
+﻿## Library 的打包
 >打包库文件与之前的打包入口文件不同，库文件要求可以给别人使用，并且可以通过多种方式引入。
 
 **配置**
@@ -126,6 +126,7 @@ module.exports = {
 
 **相关规则的解释**
 * Expected linebreaks to be 'LF' but found 'CRLF' -- 操作系统不同导致默认换行符不一样导致的。
+rules 里面 配置 "linebreak-style": [0 ,"error", "windows"], //允许windows开发环境
 * Unable to resolve path to module './App'  import/no-unresolved -- eslint 不认识不加省略后缀的文件，在配置项中告诉它，我们在 webpack 配置项中使用了后缀省略
 
 ```
@@ -143,6 +144,12 @@ module.exports = {
 ```
 
 ## Webpack 性能优化
+1、跟上技术的迭代（使用最新的 Webpack、Node、Npm）
+2、在尽可能少的模块上应用 Loader -- 指定应用 Loader 的文件/夹 (合理使用 exclude include)
+3、Plugin 尽可能精简并确保可靠
+>某些实用工具， plugins 和 loaders 都只能在构建生产环境时才有用。在开发时使用 UglifyJsPlugin 来压缩和修改代码是没有意义的。
+
+4、resolve 参数合理配置
 
 
 ## 多页面打包配置
