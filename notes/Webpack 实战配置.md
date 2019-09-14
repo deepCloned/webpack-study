@@ -153,3 +153,49 @@ module.exports = {
 
 
 ## 多页面打包配置
+> 多页面，多入口文件的打包。
+
+* 首先，定义好模板文件；
+* 使用 html-webpack-plugin 指定各个页面的模板文件
+* 使用 html-loader 打包 html 页面，不使用这个 loader，无法实现实现对图片的打包
+* 指定每个页面使用的入口文件（chunks）
+
+**配置**
+
+```
+// webpack.base.js
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.html$/,
+        loader: 'html-loader'
+      }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      // 模板
+      template: '../src/index.html',
+      // 打包过后的文件名
+      filename: 'index.html',
+      // 需要引入的入口文件
+      chunks: ['jquery', 'index']
+    }),
+    new HtmlWebpackPlugin({
+      template: '../src/login.html',
+      filename: 'login.html',
+      chunks: ['jquery', 'login']
+    })
+  ]
+}
+```
+
+**多页面引用中引入 jquery**
+
+* 安装依赖 npm i jquery --save
+* 新建 jquery.js，引入 jquery，挂载到全局
+* 配置入口文件，jquery.js
+* 各个页面配置模板文件的时候引入 chunks

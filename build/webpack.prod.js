@@ -10,11 +10,11 @@ module.exports = merge(baseConfig, {
   optimization: {
     minimizer: [
       new OptimizeCssAssetsPlugin({})
-    ]
+    ],
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
     chunkFilename: '[name].[contentHash].js',
     filename: '[name].[contentHash].js'
-  }
-})
+  },
+});
